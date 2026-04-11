@@ -1,11 +1,10 @@
-# CloudFormation template in YAML
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Template to create an S3 bucket, OAC and CloudFront Distribution
 Resources:
   AssetsBucket:
     Type: 'AWS::S3::Bucket'
     Properties: 
-      BucketName: 'aws-practitioner-for-js-cloudformation-bucket'
+      BucketName: 'js-cf-assets-cmunguia-yml'
   AssetsBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -24,7 +23,7 @@ Resources:
     Type: 'AWS::CloudFront::OriginAccessControl'
     Properties:
       OriginAccessControlConfig:
-        Name: 'aws-practitioner-for-js-cloudformation-oac'
+        Name: 'cf-oac-cmunguia-yml'
         OriginAccessControlOriginType: s3
         SigningBehavior: always
         SigningProtocol: sigv4
@@ -32,6 +31,7 @@ Resources:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
+        PriceClass: PriceClass_100
         DefaultRootObject: index.html
         Enabled: true
         DefaultCacheBehavior: 
