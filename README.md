@@ -69,3 +69,9 @@ Combination of `cloudfront:setup` and `cloudfront:build:deploy` commands with or
 ### `serverless:remove`
 
 Remove an entire stack configured in `serverless.yml` via CloudFormation.
+
+
+
+> [!NOTE]
+`chmod +x scripts/upload-and-invalidate.sh` is needed so it has access to the script
+
