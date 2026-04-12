@@ -158,3 +158,8 @@ your-app/
 - **CloudFront** — serves the app over HTTPS with Origin Access Control (OAC), handles SPA routing by returning `index.html` on 403/404 errors
 - **CDK** — provisions and manages all infrastructure as code
 - **dotenv** — loads your `.env` credentials automatically during CDK synth and deploy
+
+
+> [!NOTE]
+URLS Available:
+Part 2.1 & 2.2: https://d3d3779215347.cloudfront.net
