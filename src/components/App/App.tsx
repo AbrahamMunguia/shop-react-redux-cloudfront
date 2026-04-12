@@ -7,12 +7,14 @@ import PageProductImport from "~/components/pages/admin/PageProductImport/PagePr
 import PageCart from "~/components/pages/PageCart/PageCart";
 import PageProducts from "~/components/pages/PageProducts/PageProducts";
 import { Typography } from "@mui/material";
+import ErrorPage from "../pages/Error/Error";
 
 function App() {
   return (
     <MainLayout>
       <Routes>
         <Route path="/" element={<PageProducts />} />
+        <Route path="/error" element={<ErrorPage />} />
         <Route path="cart" element={<PageCart />} />
         <Route path="admin/orders">
           <Route index element={<PageOrders />} />
