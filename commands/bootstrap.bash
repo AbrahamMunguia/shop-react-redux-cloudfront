@@ -1,0 +1,1 @@
+source .env && cdk bootstrap aws://$AWS_ACCOUNT/$AWS_REGION

@@ -1,71 +1,165 @@
-# React-shop-cloudfront
+# React + Vite — AWS S3 & CloudFront Deployment with CDK
 
-This is frontend starter project for nodejs-aws mentoring program. It uses the following technologies:
+This project is a React application built with Vite, deployed to AWS S3 and served via CloudFront using the AWS CDK.
 
-- [Vite](https://vitejs.dev/) as a project bundler
-- [React](https://beta.reactjs.org/) as a frontend framework
-- [React-router-dom](https://reactrouterdotcom.fly.dev/) as a routing library
-- [MUI](https://mui.com/) as a UI framework
-- [React-query](https://react-query-v3.tanstack.com/) as a data fetching library
-- [Formik](https://formik.org/) as a form library
-- [Yup](https://github.com/jquense/yup) as a validation schema
-- [Serverless](https://serverless.com/) as a serverless framework
-- [Vitest](https://vitest.dev/) as a test runner
-- [MSW](https://mswjs.io/) as an API mocking library
-- [Eslint](https://eslint.org/) as a code linting tool
-- [Prettier](https://prettier.io/) as a code formatting tool
-- [TypeScript](https://www.typescriptlang.org/) as a type checking tool
+---
+
+## Required Versions
+
+| Package | Version |
+|---|---|
+| `react` | `^18.2.0` |
+| `typescript` | `^4.7.4` |
+| `dotenv` | `^17.4.1` |
+| `node` | `>= 18.x` |
+| `aws-cdk` (CLI) | Latest |
+
+---
+
+## Prerequisites
+
+Make sure the following are installed on your machine before getting started:
+
+- [Node.js](https://nodejs.org/) `>= 18.x`
+- [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
+- AWS CDK CLI:
+  ```bash
+  npm install -g aws-cdk
+  ```
+
+---
+
+## Environment Setup
+
+Create a `.env` file at the **root of the project** with your AWS credentials:
+
+```env
+AWS_ACCESS_KEY_ID=your_access_key_id
+AWS_SECRET_ACCESS_KEY=your_secret_access_key
+AWS_ACCOUNT=your_aws_account_id
+AWS_REGION=us-east-1
+```
+
+> **Where to find these values:**
+> - Go to **AWS Console → IAM → Users → Your User → Security credentials**
+> - Click **Create access key** → choose **CLI** → copy the values
+> - Your Account ID is found in the **top-right corner** of the AWS Console
+
+> ⚠️ **Never commit `.env` to version control.** Make sure `.env` is listed in your `.gitignore`.
+
+```bash
+echo ".env" >> .gitignore
+```
+
+---
+
+## Installation
+
+Install all project dependencies:
+
+```bash
+npm install
+```
+
+---
 
 ## Available Scripts
 
-### `start`
+| Script | Description |
+|---|---|
+| `npm run start` | Start local development server |
+| `npm run build` | Type-check and build the app for production |
+| `npm run cdk:synth` | Synthesize the CDK CloudFormation template |
+| `npm run cdk:bootstrap` | Bootstrap the CDK toolkit in your AWS account/region |
+| `npm run cdk:deploy` | Deploy the CDK stack (S3 + CloudFront) |
+| `npm run deploy:first` | **First-time full deploy**: build + bootstrap + deploy |
+| `npm run deploy` | **Subsequent deploys**: build + deploy (skips bootstrap) |
 
-Starts the project in dev mode with mocked API on local environment.
+---
 
-### `build`
+## First-Time Deployment
 
-Builds the project for production in `dist` folder.
+Run this command once to build the app, bootstrap CDK in your AWS account, and deploy the infrastructure:
 
-### `preview`
+```bash
+npm run deploy:first
+```
 
-Starts the project in production mode on local environment.
+This will:
+1. Build the React app (`tsc && vite build`)
+2. Bootstrap the CDK toolkit in your AWS account and region
+3. Deploy the S3 bucket and CloudFront distribution via CDK
 
-### `test`, `test:ui`, `test:coverage`
+After deployment, CDK will print your:
+- **BucketName** — the S3 bucket where your app is hosted
+- **DistributionId** — your CloudFront distribution ID
+- **CloudFrontURL** — the public URL of your application
 
-Runs tests in console, in browser or with coverage.
+> After the first deploy, upload your build to S3 and create a CloudFront invalidation manually:
+>
+> ```bash
+> aws s3 sync dist/ s3://YOUR_BUCKET_NAME --delete
+>
+> aws cloudfront create-invalidation \
+>   --distribution-id YOUR_DISTRIBUTION_ID \
+>   --paths "/*"
+> ```
 
-### `lint`, `prettier`
+---
 
-Runs linting and formatting for all files in `src` folder.
+## Subsequent Deployments
 
-### `client:deploy`, `client:deploy:nc`
+For any future infrastructure or code changes, run:
 
-Deploy the project build from `dist` folder to configured in `serverless.yml` AWS S3 bucket with or without confirmation.
+```bash
+npm run deploy
+```
 
-### `client:build:deploy`, `client:build:deploy:nc`
+This skips the bootstrap step (only needed once per AWS account/region).
 
-Combination of `build` and `client:deploy` commands with or without confirmation.
+---
 
-### `cloudfront:setup`
+## Destroying the Infrastructure
 
-Deploy configured in `serverless.yml` stack via CloudFormation.
+To tear down all AWS resources (S3 bucket and CloudFront distribution):
 
-### `cloudfront:domainInfo`
+```bash
+cd infra && cdk destroy --force
+```
 
-Display cloudfront domain information in console.
+> The S3 bucket is configured with `autoDeleteObjects: true` and `RemovalPolicy.DESTROY`, so all files and the bucket itself will be automatically removed. Nothing will be left behind.
 
-### `cloudfront:invalidateCache`
+---
 
-Invalidate cloudfront cache.
+## Project Structure
 
-### `cloudfront:build:deploy`, `cloudfront:build:deploy:nc`
+```
+your-app/
+├── infra/                   # AWS CDK infrastructure
+│   ├── bin/
+│   │   └── app.ts           # CDK entry point
+│   ├── lib/
+│   │   └── stack.ts         # S3 + CloudFront stack definition
+│   └── cdk.json
+├── src/                     # React source code
+├── scripts/
+│   └── upload-and-invalidate.sh  # Upload + cache invalidation script
+├── .env                     # AWS credentials (never commit this)
+├── .gitignore
+├── package.json
+└── vite.config.ts
+```
 
-Combination of `client:build:deploy` and `cloudfront:invalidateCache` commands with or without confirmation.
+---
 
-### `cloudfront:update:build:deploy`, `cloudfront:update:build:deploy:nc`
+## How It Works
 
-Combination of `cloudfront:setup` and `cloudfront:build:deploy` commands with or without confirmation.
+- **S3 Bucket** — stores the production build, kept **private** (no public access)
+- **CloudFront** — serves the app over HTTPS with Origin Access Control (OAC), handles SPA routing by returning `index.html` on 403/404 errors
+- **CDK** — provisions and manages all infrastructure as code
+- **dotenv** — loads your `.env` credentials automatically during CDK synth and deploy
 
-### `serverless:remove`
 
-Remove an entire stack configured in `serverless.yml` via CloudFormation.
+> [!NOTE]
+URLS Available:
+Part 2.1 & 2.2: https://d3d3779215347.cloudfront.net

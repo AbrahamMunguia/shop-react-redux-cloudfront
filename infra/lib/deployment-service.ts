@@ -17,6 +17,7 @@ export class DeploymentService extends Construct {
         const hostingBucket = new aws_s3.Bucket(this, 'FrontendBucket', {
             blockPublicAccess: aws_s3.BlockPublicAccess.BLOCK_ALL,
             removalPolicy: RemovalPolicy.DESTROY,
+            autoDeleteObjects: true,
         });
 
         const distribution = new aws_cloudfront.Distribution(
