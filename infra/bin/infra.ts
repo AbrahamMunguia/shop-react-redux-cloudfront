@@ -4,6 +4,7 @@ import * as cdk from 'aws-cdk-lib';
 import { DeployWebAppStack } from '../lib/deploy-web-app-stack';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import { HelloLambdaStack } from '../lib/hello-lambda-stack';
 
 const app = new cdk.App();
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
@@ -16,8 +17,8 @@ if (!account || !region) {
 }
 
 new DeployWebAppStack(app, 'DeployWebAppStack', {
-  /* If you don't specify 'env', this stack will be environment-agnostic.
-   * Account/Region-dependent features and context lookups will not work,
-   * but a single synthesized template can be deployed anywhere. */
   env: { account, region },
 });
+
+new HelloLambdaStack(app, 'HelloLambdaStack', {});
+
