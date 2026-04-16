@@ -27,7 +27,7 @@ export default function Products() {
                 <Link
                   component={RouterLink}
                   sx={{ color: "inherit" }}
-                  underline="none"
+                  underline="always"
                   to={`/product/${product.id}`}
                 >
                   {product.title}
