@@ -41,7 +41,7 @@ export default function ProductsTable() {
               <TableCell align="right">
                 {formatAsPrice(product.price)}
               </TableCell>
-              <TableCell align="right">{product.count}</TableCell>
+              <TableCell align="right">{product.stock}</TableCell>
               <TableCell align="right">
                 <Button
                   size="small"

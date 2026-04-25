@@ -32,6 +32,7 @@ export default function Products() {
                 </Link>
               </Typography>
               <Typography>{formatAsPrice(product.price)}</Typography>
+              <Typography>Stock: {stock}</Typography>
             </CardContent>
             <CardActions>
               <AddProductToCart product={product} />
