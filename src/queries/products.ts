@@ -48,7 +48,7 @@ export function useRemoveProductCache() {
 
 export function useUpsertAvailableProduct() {
   return useMutation((values: AvailableProduct) =>
-    axios.post<AvailableProduct>(`${API_PATHS.addProduct}/product`, values)
+    axios.post<AvailableProduct>(`${API_PATHS.addProduct}`, values)
   );
 }
 
