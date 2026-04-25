@@ -26,9 +26,9 @@ export default function PageProductForm() {
     const formattedValues = AvailableProductSchema.cast(values);
     const productToSave = id
       ? {
-          ...formattedValues,
-          id,
-        }
+        ...formattedValues,
+        id,
+      }
       : formattedValues;
     return upsertAvailableProduct(productToSave, {
       onSuccess: () => {
@@ -89,8 +89,8 @@ export default function PageProductForm() {
                 <Grid item xs={12} sm={4}>
                   <Field
                     component={TextField}
-                    name="count"
-                    label="Count"
+                    name="stock"
+                    label="Stock"
                     fullWidth
                     autoComplete="off"
                     required
