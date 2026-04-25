@@ -15,7 +15,7 @@ export default function Products() {
   if (isLoading) return <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '1rem' }}>{Array.from({ length: 9 }).map((_, index) => <Skeleton key={index} variant="rectangular" width={300} height={192} />)}</div>
   return (
     <Grid container spacing={4}>
-      {data.map(({ count, ...product }) => (
+      {data.map(({ stock, ...product }) => (
         <Grid item key={product.id} xs={12} sm={6} md={4}>
           <Card
             sx={{ height: "100%", display: "flex", flexDirection: "column" }}
