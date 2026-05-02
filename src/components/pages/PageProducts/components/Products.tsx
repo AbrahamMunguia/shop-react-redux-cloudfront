@@ -8,16 +8,14 @@ import AddProductToCart from "~/components/AddProductToCart/AddProductToCart";
 import { useAvailableProducts } from "~/queries/products";
 import { Link as RouterLink } from "react-router-dom";
 import Link from "@mui/material/Link";
+import { Skeleton } from "@mui/material";
 export default function Products() {
   const { data = [], isLoading } = useAvailableProducts();
 
-  if (isLoading) {
-    return <Typography>Loading...</Typography>;
-  }
+  if (isLoading) return <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '1rem' }}>{Array.from({ length: 9 }).map((_, index) => <Skeleton key={index} variant="rectangular" width={300} height={192} />)}</div>
   return (
     <Grid container spacing={4}>
-      {/* eslint-disable-next-line @typescript-eslint/no-unused-vars */}
-      {data.map(({ count, ...product }, index) => (
+      {data.map(({ stock, ...product }) => (
         <Grid item key={product.id} xs={12} sm={6} md={4}>
           <Card
             sx={{ height: "100%", display: "flex", flexDirection: "column" }}
@@ -34,6 +32,7 @@ export default function Products() {
                 </Link>
               </Typography>
               <Typography>{formatAsPrice(product.price)}</Typography>
+              <Typography>Stock: {stock}</Typography>
             </CardContent>
             <CardActions>
               <AddProductToCart product={product} />
