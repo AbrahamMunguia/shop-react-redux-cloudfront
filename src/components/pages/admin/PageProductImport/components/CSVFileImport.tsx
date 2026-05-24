@@ -29,7 +29,7 @@ export default function CSVFileImport({ url, title }: CSVFileImportProps) {
     console.log("uploadFile to", url);
     if (!file) return;
     const importURL = "https://w65oxdpuvl.execute-api.us-east-1.amazonaws.com/prod/import";
-    const response = await axios.get(importURL, {
+    await axios.get(importURL, {
       headers: {
         "Authorization": `Bearer ${sessionStorage.getItem("authorization_token")}`,
       },
@@ -37,7 +37,7 @@ export default function CSVFileImport({ url, title }: CSVFileImportProps) {
         name: encodeURIComponent(file.name),
       },
     });
-    const result = await axios.post(importURL, file, {
+    await axios.post(importURL, file, {
       headers: {
         "Content-Type": "text/csv",
         "Authorization": `Bearer ${sessionStorage.getItem("authorization_token")}`,
