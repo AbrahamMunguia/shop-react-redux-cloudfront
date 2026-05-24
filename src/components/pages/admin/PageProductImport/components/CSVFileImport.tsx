@@ -31,20 +31,24 @@ export default function CSVFileImport({ url, title }: CSVFileImportProps) {
     const importURL = "https://w65oxdpuvl.execute-api.us-east-1.amazonaws.com/prod/import";
     const response = await axios.get(importURL, {
       headers: {
-        "Authorization": `bearer ${sessionStorage.getItem("authorization_token")}`,
+        "Authorization": `Bearer ${sessionStorage.getItem("authorization_token")}`,
       },
       params: {
         name: encodeURIComponent(file.name),
       },
     });
-    const result = await axios.put(response.data.url, file, {
+    const result = await axios.post(importURL, file, {
       headers: {
         "Content-Type": "text/csv",
-        "Authorization": `bearer ${sessionStorage.getItem("authorization_token")}`,
+        "Authorization": `Bearer ${sessionStorage.getItem("authorization_token")}`,
       },
+      params: {
+        name: encodeURIComponent(file.name),
+      }
+    }).finally(async () => {
+      await invalidateAvailableProducts();
+      setFile(undefined);
     });
-    invalidateAvailableProducts();
-    setFile(undefined);
   };
   return (
     <Box>
