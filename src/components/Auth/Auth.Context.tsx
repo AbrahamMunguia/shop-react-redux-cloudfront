@@ -39,10 +39,7 @@ export function AuthProvider({
             if (response.status === 200) {
                 localStorage.setItem(
                     'basic-auth',
-                    JSON.stringify({
-                        username,
-                        password,
-                    }),
+                    btoa(`${username}:${password}`)
                 );
                 setAuthenticated(true);
                 return true;
