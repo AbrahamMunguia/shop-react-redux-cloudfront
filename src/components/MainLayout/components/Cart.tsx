@@ -6,7 +6,8 @@ import { useCart } from "~/queries/cart";
 
 export default function Cart() {
   const { data = [], isLoading } = useCart();
-  const badgeContent = data.length || undefined;
+  //@ts-ignore
+  const badgeContent = data.data?.cart.items?.reduce((sum, item) => sum + item.count, 0) || undefined;
   if (isLoading) return <></>
   return (
     <IconButton color="inherit" component={Link} to="/cart" size="large">
