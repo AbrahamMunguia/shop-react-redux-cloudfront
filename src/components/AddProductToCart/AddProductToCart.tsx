@@ -16,8 +16,9 @@ export default function AddProductToCart({ product }: AddProductToCartProps) {
   const invalidateCart = useInvalidateCart();
 
   const addProduct = () => {
+    console.log(`to add: `, { product, count: cartItem ? cartItem.count + 1 : 1 })
     upsertCart(
-      { product, count: cartItem ? cartItem.count + 1 : 1 },
+      { productId: product.id!, count: cartItem ? cartItem.count + 1 : 1 },
       { onSuccess: invalidateCart }
     );
   };

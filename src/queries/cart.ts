@@ -29,10 +29,10 @@ export function useInvalidateCart() {
 }
 
 export function useUpsertCart() {
-  return useMutation((values: CartItem) =>
-    axios.put<CartItem[]>(`${API_PATHS.cart}/profile/cart`, values, {
+  return useMutation((values: { productId: string, count: number }) =>
+    axios.put<CartItem>(`${API_PATHS.cart}`, values, {
       headers: {
-        Authorization: `Basic ${localStorage.getItem("authorization_token")}`,
+        Authorization: `Basic ${localStorage.getItem("basic-auth")}`,
       },
     })
   );
