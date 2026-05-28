@@ -12,6 +12,7 @@ import Box from "@mui/material/Box";
 import { useCart, useInvalidateCart } from "~/queries/cart";
 import AddressForm from "~/components/pages/PageCart/components/AddressForm";
 import { useSubmitOrder } from "~/queries/orders";
+import OrderSuccessAnimation from "~/components/OrderSuccessAnimation";
 
 enum CartStep {
   ReviewCart,
@@ -28,7 +29,8 @@ const CartIsEmpty = () => (
   </Typography>
 );
 
-const Success = () => (
+/** Shown after the entrance animation completes */
+const SuccessStatic = () => (
   <React.Fragment>
     <Typography variant="h5" gutterBottom>
       Thank you for your order.
@@ -50,9 +52,13 @@ export default function PageCart() {
     CartStep.ReviewCart
   );
   const [address, setAddress] = useState<Address>(initialAddressValues);
+  // Controls whether the full-screen animation is still playing
+  const [showAnimation, setShowAnimation] = useState(false);
 
   const cartItems = (data as any)?.data?.cart?.items || [];
   const isCartEmpty = cartItems.length === 0;
+
+  // ─── Handlers (original logic preserved) ──────────────────────────────────
 
   const handleNext = () => {
     if (activeStep !== CartStep.ReviewOrder) {
@@ -69,6 +75,7 @@ export default function PageCart() {
 
     submitOrder(values as Omit<Order, "id">, {
       onSuccess: () => {
+        setShowAnimation(true); // ← trigger animation first
         setActiveStep(activeStep + 1);
         invalidateCart();
       },
@@ -84,55 +91,71 @@ export default function PageCart() {
     handleNext();
   };
 
+  // ─── Render ────────────────────────────────────────────────────────────────
+
   return (
-    <PaperLayout>
-      <Typography component="h1" variant="h4" align="center">
-        Checkout
-      </Typography>
-      <Stepper
-        activeStep={activeStep}
-        sx={{ padding: (theme) => theme.spacing(3, 0, 5) }}
-      >
-        {steps.map((label) => (
-          <Step key={label}>
-            <StepLabel>{label}</StepLabel>
-          </Step>
-        ))}
-      </Stepper>
-      {isCartEmpty && <CartIsEmpty />}
-      {!isCartEmpty && activeStep === CartStep.ReviewCart && (
-        <ReviewCart items={cartItems} />
+    <>
+      {/* Full-screen success animation — rendered on top of everything */}
+      {showAnimation && (
+        <OrderSuccessAnimation onAnimationEnd={() => setShowAnimation(false)} />
       )}
-      {activeStep === CartStep.Address && (
-        <AddressForm
-          initialValues={address}
-          onBack={handleBack}
-          onSubmit={handleAddressSubmit}
-        />
-      )}
-      {activeStep === CartStep.ReviewOrder && (
-        <ReviewOrder address={address} items={cartItems} />
-      )}
-      {activeStep === CartStep.Success && <Success />}
-      {!isCartEmpty &&
-        activeStep !== CartStep.Address &&
-        activeStep !== CartStep.Success && (
-          <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-            {activeStep !== CartStep.ReviewCart && (
-              <Button onClick={handleBack} sx={{ mt: 3, ml: 1 }}>
-                Back
-              </Button>
-            )}
-            <Button
-              variant="contained"
-              color="primary"
-              sx={{ mt: 3, ml: 1 }}
-              onClick={handleNext}
-            >
-              {activeStep === steps.length - 1 ? "Place order" : "Next"}
-            </Button>
-          </Box>
+
+      <PaperLayout>
+        <Typography component="h1" variant="h4" align="center">
+          Checkout
+        </Typography>
+        <Stepper
+          activeStep={activeStep}
+          sx={{ padding: (theme) => theme.spacing(3, 0, 5) }}
+        >
+          {steps.map((label) => (
+            <Step key={label}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
+
+        {isCartEmpty && <CartIsEmpty />}
+
+        {!isCartEmpty && activeStep === CartStep.ReviewCart && (
+          <ReviewCart items={cartItems} />
         )}
-    </PaperLayout>
+
+        {activeStep === CartStep.Address && (
+          <AddressForm
+            initialValues={address}
+            onBack={handleBack}
+            onSubmit={handleAddressSubmit}
+          />
+        )}
+
+        {activeStep === CartStep.ReviewOrder && (
+          <ReviewOrder address={address} items={cartItems} />
+        )}
+
+        {/* Static success message — visible once animation fades out */}
+        {activeStep === CartStep.Success && !showAnimation && <SuccessStatic />}
+
+        {!isCartEmpty &&
+          activeStep !== CartStep.Address &&
+          activeStep !== CartStep.Success && (
+            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+              {activeStep !== CartStep.ReviewCart && (
+                <Button onClick={handleBack} sx={{ mt: 3, ml: 1 }}>
+                  Back
+                </Button>
+              )}
+              <Button
+                variant="contained"
+                color="primary"
+                sx={{ mt: 3, ml: 1 }}
+                onClick={handleNext}
+              >
+                {activeStep === steps.length - 1 ? "Place order" : "Next"}
+              </Button>
+            </Box>
+          )}
+      </PaperLayout>
+    </>
   );
 }
