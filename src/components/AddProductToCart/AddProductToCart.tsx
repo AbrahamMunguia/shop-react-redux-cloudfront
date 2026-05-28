@@ -1,53 +1,114 @@
+import { useState, useEffect, useRef } from "react";
 import Typography from "@mui/material/Typography";
-import { Product } from "~/models/Product";
+import IconButton from "@mui/material/IconButton";
 import CartIcon from "@mui/icons-material/ShoppingCart";
 import Add from "@mui/icons-material/Add";
 import Remove from "@mui/icons-material/Remove";
-import IconButton from "@mui/material/IconButton";
+
+import { Product } from "~/models/Product";
 import { useCart, useInvalidateCart, useUpsertCart } from "~/queries/cart";
 
 type AddProductToCartProps = {
   product: Product;
+  stock: number;
 };
 
-export default function AddProductToCart({ product }: AddProductToCartProps) {
-  const { data = [], isFetching } = useCart();
+type CartItem = {
+  cartId: string;
+  productId: string;
+  count: number;
+};
+
+export default function AddProductToCart({
+  product,
+  stock,
+}: AddProductToCartProps) {
+  const { data, isFetching } = useCart();
+
   const { mutate: upsertCart } = useUpsertCart();
   const invalidateCart = useInvalidateCart();
+  // @ts-ignore - remove once the cart query is typed
+  const cartItems: CartItem[] = data?.data?.cart?.items ?? [];
 
-  const addProduct = () => {
-    console.log(`to add: `, { product, count: cartItem ? cartItem.count + 1 : 1 })
+  const cartItem = cartItems.find(
+    (item) => item.productId === product.id
+  );
+
+  const [localCount, setLocalCount] = useState<number>(
+    cartItem?.count ?? 0
+  );
+
+  const pendingMutation = useRef(false);
+
+  useEffect(() => {
+    if (!pendingMutation.current) {
+      setLocalCount(cartItem?.count ?? 0);
+    }
+  }, [cartItem?.count]);
+
+  const updateCart = (nextCount: number) => {
+    if (nextCount < 0 || nextCount > stock) {
+      return;
+    }
+
+    const previousCount = localCount;
+
+    setLocalCount(nextCount);
+    pendingMutation.current = true;
+
     upsertCart(
-      { productId: product.id!, count: cartItem ? cartItem.count + 1 : 1 },
-      { onSuccess: invalidateCart }
+      {
+        productId: product.id!,
+        count: nextCount,
+      },
+      {
+        onSuccess: () => {
+          pendingMutation.current = false;
+          invalidateCart();
+        },
+        onError: () => {
+          pendingMutation.current = false;
+          setLocalCount(previousCount);
+        },
+      }
     );
   };
 
-  const removeProduct = () => {
-    if (cartItem) {
-      upsertCart(
-        { ...cartItem, count: cartItem.count - 1 },
-        { onSuccess: invalidateCart }
-      );
-    }
-  };
-  if (isFetching) return <></>
-  //@ts-ignore
-  const cartItem = data.data.cart.items.find((i) => i.product.id === product.id);
+  if (isFetching && !cartItem && localCount === 0) {
+    return null;
+  }
+  if (stock === 0) return <></>
+  if (localCount > 0) {
+    return (
+      <>
+        <IconButton
+          size="large"
+          disabled={isFetching || localCount <= 0}
+          onClick={() => updateCart(localCount - 1)}
+        >
+          <Remove color="secondary" />
+        </IconButton>
 
-  return cartItem ? (
-    <>
-      <IconButton disabled={isFetching} onClick={removeProduct} size="large">
-        <Remove color={"secondary"} />
-      </IconButton>
-      <Typography align="center">{cartItem.count}</Typography>
-      <IconButton disabled={isFetching} onClick={addProduct} size="large">
-        <Add color={"secondary"} />
-      </IconButton>
-    </>
-  ) : (
-    <IconButton disabled={isFetching} onClick={addProduct} size="large">
-      <CartIcon color={"secondary"} />
+        <Typography align="center">{localCount}</Typography>
+
+        <IconButton
+          size="large"
+          disabled={isFetching || localCount >= stock}
+          onClick={() => updateCart(localCount + 1)}
+        >
+          <Add color="secondary" />
+        </IconButton>
+      </>
+    );
+  }
+
+  return (
+    <IconButton
+      size="large"
+      disabled={isFetching || stock === 0}
+      onClick={() => updateCart(1)}
+    >
+      <CartIcon color="secondary" />
     </IconButton>
   );
 }
