@@ -9,28 +9,24 @@ import {
     Typography,
 } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { login } from '../../Auth/Auth';
+import { useAuth } from '~/components/Auth/Auth.Context';
 
 export default function PageLogin() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { login } = useAuth();
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const valid = await login(username, password).then(() => { console.log('Login successful'); return true; }).catch(() => { console.log('Login failed'); return false; });
-        if (!valid) {
-            setUsername('');
-            setPassword('');
-            alert('Invalid credentials');
-            return;
-        }
-        const redirectTo =
-            (location.state as any)?.from?.pathname || '/';
 
-        navigate(redirectTo, { replace: true });
+        const success = await login(username, password);
+
+        if (success) {
+            navigate('/');
+        }
     };
 
     return (

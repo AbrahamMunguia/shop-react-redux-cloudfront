@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { Navigate, Outlet } from 'react-router-dom';
 import API_PATHS from '~/constants/apiPaths';
+import { useAuth } from './Auth.Context';
 
 export const isAuthenticated = () => {
     const credentials = localStorage.getItem('basic-auth');
@@ -18,30 +19,14 @@ export const isAuthenticated = () => {
     }
 };
 
+
+
 export default function AuthGuard() {
-    if (!isAuthenticated()) {
-        return <Navigate to="/login" replace />;
-    }
+    const { authenticated } = useAuth();
 
-    return <Outlet />;
+    return authenticated ? (
+        <Outlet />
+    ) : (
+        <Navigate to="/login" replace />
+    );
 }
-export const login = async (username: string, password: string) => {
-    const loginUrl = `${API_PATHS.cart}`
-    const response = await axios.get(loginUrl, { auth: { username, password } })
-    if (response.status === 200) {
-        localStorage.setItem(
-            'basic-auth',
-            JSON.stringify({
-                username,
-                password,
-            }),
-        );
-        return true;
-    } else {
-        return false;
-    }
-};
-
-export const logout = () => {
-    localStorage.removeItem('basic-auth');
-};
