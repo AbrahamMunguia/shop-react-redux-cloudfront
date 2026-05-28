@@ -35,7 +35,7 @@ export default function Products() {
               <Typography>Stock: {stock}</Typography>
             </CardContent>
             <CardActions>
-              <AddProductToCart product={product} />
+              <AddProductToCart product={product} stock={stock} />
             </CardActions>
           </Card>
         </Grid>

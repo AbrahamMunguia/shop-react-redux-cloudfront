@@ -12,7 +12,9 @@ export default function ReviewCart({ items }: ReviewCartProps) {
       <Typography variant="h6" gutterBottom>
         Order summary
       </Typography>
-      <CartItems items={items} isEditable />
+      {//@ts-ignore
+        <CartItems items={items} isEditable />
+      }
     </>
   );
 }

@@ -15,7 +15,9 @@ export default function ReviewOrder({ address, items }: ReviewOrderProps) {
       <Typography variant="h6" gutterBottom>
         Order summary
       </Typography>
-      <CartItems items={items} isEditable={false} />
+      { // @ts-ignore
+        <CartItems items={items} isEditable={false} />
+      }
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6}>
           <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>

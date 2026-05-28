@@ -9,11 +9,12 @@ import Menu from "@mui/material/Menu";
 import Cart from "~/components/MainLayout/components/Cart";
 import { Link as RouterLink } from "react-router-dom";
 import Link from "@mui/material/Link";
+import { useAuth } from "~/components/Auth/Auth.Context";
 
 export default function Header() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const auth = true;
+  const { authenticated, logout } = useAuth();
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -22,7 +23,6 @@ export default function Header() {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
   return (
     <AppBar position="relative">
       <Toolbar>
@@ -37,7 +37,7 @@ export default function Header() {
           </Link>
         </Typography>
 
-        {auth && (
+        {authenticated && (
           <div>
             <IconButton
               aria-label="account of current user"
@@ -78,10 +78,17 @@ export default function Header() {
               >
                 Manage products
               </MenuItem>
+              <MenuItem
+                component={RouterLink}
+                to="/login"
+                onClick={() => logout()}
+              >
+                Logout
+              </MenuItem>
             </Menu>
+            <Cart />
           </div>
         )}
-        <Cart />
       </Toolbar>
     </AppBar>
   );
