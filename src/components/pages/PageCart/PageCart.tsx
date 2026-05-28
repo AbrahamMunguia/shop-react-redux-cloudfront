@@ -51,7 +51,8 @@ export default function PageCart() {
   );
   const [address, setAddress] = useState<Address>(initialAddressValues);
 
-  const isCartEmpty = data.length === 0;
+  const cartItems = (data as any)?.data?.cart?.items || [];
+  const isCartEmpty = cartItems.length === 0;
 
   const handleNext = () => {
     if (activeStep !== CartStep.ReviewOrder) {
@@ -59,8 +60,8 @@ export default function PageCart() {
       return;
     }
     const values = {
-      items: data.map((i) => ({
-        productId: i.product.id,
+      items: cartItems.map((i: any) => ({
+        productId: i.productId,
         count: i.count,
       })),
       address,
@@ -100,8 +101,7 @@ export default function PageCart() {
       </Stepper>
       {isCartEmpty && <CartIsEmpty />}
       {!isCartEmpty && activeStep === CartStep.ReviewCart && (
-        //@ts-ignore
-        <ReviewCart items={data?.data?.cart?.items} />
+        <ReviewCart items={cartItems} />
       )}
       {activeStep === CartStep.Address && (
         <AddressForm
@@ -111,7 +111,7 @@ export default function PageCart() {
         />
       )}
       {activeStep === CartStep.ReviewOrder && (
-        <ReviewOrder address={address} items={data} />
+        <ReviewOrder address={address} items={cartItems} />
       )}
       {activeStep === CartStep.Success && <Success />}
       {!isCartEmpty &&
